@@ -1,9 +1,11 @@
 // Problem 1: Counting DNA Nucleotides
-use std::fs;
+use itertools::Itertools;
 use std::collections::HashMap;
+use std::fs;
 
-fn counting_dna_nucleotides() {
-    // Problem 1 Counting DNA Nucleotides
+/// Problem 1 Counting DNA Nucleotides
+/// Returns the number of nucleotides in a sequence
+pub fn counting_dna_nucleotides() -> HashMap<char, i32> {
     let my_path: &str = "/Users/mladenrasic/Downloads/rosalind_dna-1.txt";
 
     // Grab sequence and clean up
@@ -19,13 +21,25 @@ fn counting_dna_nucleotides() {
         *count += 1;
     }
 
-    // Print out the values
-    for (k, v) in map.iter().sorted_by_key(|x| x.0) {
-        print!("{} ", v);
-        println!("");
-    }
+    map
 }
 
 fn main() {
-    counting_dna_nucleotides();
+    let dna_count = counting_dna_nucleotides();
+
+    // Print out the values
+    for (k, v) in dna_count.iter().sorted_by_key(|x| x.0) {
+        println!("{k} : {v}");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_counting_dna_nucleotides() {
+        let expected_res = HashMap::from([('A', 225), ('C', 224), ('G', 216), ('T', 206)]);
+        assert_eq!(expected_res, counting_dna_nucleotides());
+    }
 }
