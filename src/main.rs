@@ -1,10 +1,8 @@
-
 use std::collections::HashMap; // itertools = "0.10"
 use std::fs::{self, File};
-// use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-
+/*
 fn translate(input: &str) {
     let rna = fs::read_to_string(input)
         .expect("Unable to read file")
@@ -14,25 +12,36 @@ fn translate(input: &str) {
     // let protein = rna.chars().chunks(3).get();
     // map(|x| lookup(x)).collect();
 }
+*/
 
+/*
 fn lookup(codon: &str) -> HashMap<&str, &str> {
     let mut codon_map = HashMap::new();
-    codon_map.insert("UUU", "F");
-    codon_map.insert("AUC", "I");
-    codon_map
+
     //    let blah =
 }
+*/
 
-fn codon_table(file: &str) -> HashMap<&str, &str> {
+fn build_codon_table(file: &str) -> Option<HashMap<String, String>> {
     let mut codon_map = HashMap::new();
-    let f: &str = fs::read_to_string(file)
-        .expect("file not found error")
-        .trim();
-    codon_map
+    for line in fs::read_to_string(file)
+        .expect("codon file not found")
+        .lines()
+    {
+        let mut split = line.split_whitespace();
+        let codon = split.next().unwrap().to_string();
+        let _skip = split.next()?;
+        let amino_acid = split.next()?.to_string();
+        codon_map.insert(codon, amino_acid);
+    }
+    println!("{:?}", codon_map);
+
+    Some(codon_map)
 }
 
 fn main() {
-    // computing_gc_content() // #4
     let input = "/Users/mladenrasic/Downloads/rosalind_prot.txt";
+    let codon_file = "/Users/mladenrasic/Downloads/codon-1.txt";
+    build_codon_table(&codon_file);
     // translate(input);
 }

@@ -1,7 +1,7 @@
 /// Problem 3 Complementing a Strand of DNA
 use std::fs;
 
-fn reverse_complement(dna: String) -> String {
+pub fn reverse_complement(dna: String) -> String {
 
     let complement: String = dna 
         .chars()

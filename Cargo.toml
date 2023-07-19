@@ -7,19 +7,3 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.10.5"
-
-[[bin]]
-name = "nucleotide_counter"
-path = "src/nucleotide_counter.rs"
-
-[[bin]]
-name = "transcribe_dna"
-path = "src/transcribe_dna.rs"
-
-[[bin]]
-name = "reverse_complement"
-path = "src/reverse_complement.rs"
-
-[[bin]]
-name = "gc_content"
-path = "src/gc_content.rs"

@@ -1,14 +1,13 @@
 // Problem 4 - Computing the GC content of a DNA string
-use core::result::Result;
 use std::io::{BufRead, BufReader,Error};
 use std::fs::File;
-// use std::error::Error;
 
 //TODO - Implement function for each fasta sequence as opposed to per file
 //TODO - Or simply retain the max gc content and sequence
-fn computing_gc_content(filepath: &str) -> Result<f32, Error> {
+pub fn computing_gc_content(filepath: &str) -> Result<f32, Error> {
     let f = File::open(filepath)?;
     let buffered = BufReader::new(f);
+    "/home/mll"
 
     // Initialize count variables
     let mut gc_count = 0.0;

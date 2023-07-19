@@ -2,7 +2,7 @@
 use std::fs;
 
 /// Takes a DNA sequence and returns the RNA sequence
-fn transcribe_dna(myseq: String) -> String {
+pub fn transcribe_dna(myseq: String) -> String {
     let rna = myseq.replace("T", "U");
     rna
 }

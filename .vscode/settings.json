@@ -1,9 +1,14 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#4C061D",
-        "activityBar.foreground": "#F1FAEE",
-        "activityBar.inactiveForeground": "#F1FAEE77",
-        "activityBarBadge.background": "#bf0060",
-        "activityBarBadge.foreground": "#e7e7e7"
-    }
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#4C061D",
+    "activityBar.foreground": "#F1FAEE",
+    "activityBar.inactiveForeground": "#F1FAEE77",
+    "activityBarBadge.background": "#bf0060",
+    "activityBarBadge.foreground": "#e7e7e7"
+  },
+  "rust-analyzer.linkedProjects": [
+    "./Cargo.toml",
+    "./rustlings/Cargo.toml",
+    "./rustlings/Cargo.toml"
+  ]
 }
