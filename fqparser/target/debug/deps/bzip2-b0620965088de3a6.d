@@ -1,0 +1,11 @@
+/Users/mladenrasic/Projects/rosalind_rust/fqparser/target/debug/deps/bzip2-b0620965088de3a6.rmeta: /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/lib.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/mem.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/bufread.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/read.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/write.rs
+
+/Users/mladenrasic/Projects/rosalind_rust/fqparser/target/debug/deps/libbzip2-b0620965088de3a6.rlib: /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/lib.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/mem.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/bufread.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/read.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/write.rs
+
+/Users/mladenrasic/Projects/rosalind_rust/fqparser/target/debug/deps/bzip2-b0620965088de3a6.d: /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/lib.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/mem.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/bufread.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/read.rs /Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/write.rs
+
+/Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/lib.rs:
+/Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/mem.rs:
+/Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/bufread.rs:
+/Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/read.rs:
+/Users/mladenrasic/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bzip2-0.4.4/src/write.rs:

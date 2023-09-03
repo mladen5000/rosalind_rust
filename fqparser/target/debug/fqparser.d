@@ -1,0 +1,1 @@
+/Users/mladenrasic/Projects/rosalind_rust/fqparser/target/debug/fqparser: /Users/mladenrasic/Projects/rosalind_rust/fqparser/src/lib.rs /Users/mladenrasic/Projects/rosalind_rust/fqparser/src/main.rs /Users/mladenrasic/Projects/rosalind_rust/fqparser/src/not_main.rs
