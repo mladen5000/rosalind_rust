@@ -10,7 +10,7 @@ use rayon::prelude::*;
 use std::collections::HashMap;
 use std::fs::File;
 
-const KMER_SIZE: usize = 8;
+const KMER_SIZE: usize = 4;
 
 fn dict_last(fpath: &str) -> Result<(), Error> {
     // This approach is the fastest of the two
@@ -143,6 +143,9 @@ fn run_needletail(filename: &str) -> Result<HashMap<String, usize>, Error> {
 fn main() -> Result<(), Error> {
     // Run the k-mer counter
     let filename = "/Users/mladenrasic/Downloads/sample.fastq";
+    // let kmer_map = lib::build_kmer_counter(filename);
+    // println!("The hashmap is {:?}.", kmer_map);
+    lib::read_parser(filename, filename).and(Ok(5));
 
     // // let kmer_freq = run_needletail(filename)?;
     // let kmer_freq = not_main::run_needletail(filename)?;
@@ -151,8 +154,6 @@ fn main() -> Result<(), Error> {
     // if KMER_SIZE <= 8 {
     //     println!("K-mer frequences:\n {:?}", kmer_freq);
     // }
-
-    lib::testing(filename);
 
     Ok(())
 }

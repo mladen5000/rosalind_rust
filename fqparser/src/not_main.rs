@@ -14,8 +14,6 @@ pub fn run_needletail(filename: &str) -> Result<HashMap<String, usize>, Error> {
     while let Some(record) = reader.next() {
         // Get the record
         let seqrec = record.expect("Should be a valid record");
-        // Count bases
-        nbases += seqrec.num_bases();
         // Make all caps and trim whitespace
         let norm_seq = seqrec.normalize(false);
         // Get the reverse complement
@@ -37,7 +35,6 @@ pub fn run_needletail(filename: &str) -> Result<HashMap<String, usize>, Error> {
     let nkmers_uniq = kmer_dict.len();
 
     // Print the results
-    println!("Number of bases: {:?}", nbases);
     println!("Number of kmers: {:?}", nkmers);
     println!("Number of unique kmers: {:?}", nkmers_uniq);
 

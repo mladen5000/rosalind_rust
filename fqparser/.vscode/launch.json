@@ -1,0 +1,50 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'fqparser'",
+      "cargo": {
+        "args": ["test", "--no-run", "--lib", "--package=fqparser"],
+        "filter": {
+          "name": "fqparser",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'fqparser'",
+      "cargo": {
+        "args": ["build", "--bin=fqparser", "--package=fqparser"],
+        "filter": {
+          "name": "fqparser",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'fqparser'",
+      "cargo": {
+        "args": ["test", "--no-run", "--bin=fqparser", "--package=fqparser"],
+        "filter": {
+          "name": "fqparser",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
