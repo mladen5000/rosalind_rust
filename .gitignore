@@ -2,3 +2,5 @@
 rustlings
 rustlings
 *fastq
+.mypy_cache
+.vscode
