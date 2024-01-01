@@ -3,7 +3,9 @@ use std::{fmt::Write, fs::File};
 extern crate bio;
 use bio::io::fastq::{self, Error, FastqRead};
 
+/*
 fn interleave_fastq<R: FastqRead, W: Write>(
+
     reader1: R,
     reader2: R,
     writer: &mut W,
@@ -28,6 +30,7 @@ fn interleave_fastq<R: FastqRead, W: Write>(
 
     Ok(())
 }
+*/
 
 fn interleave_fastq2(
     reader1: fastq::Reader<BufReader<File>>,
