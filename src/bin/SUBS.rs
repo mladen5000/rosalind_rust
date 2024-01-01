@@ -7,6 +7,7 @@ use itertools::Itertools;
 fn main() {
     // let seq = "GATATATGCATATACTT".to_string();
     // let substr = "ATAT".to_string();
+
     let filepath = "/Users/mladenrasic/Downloads/rosalind_subs.txt";
     let (seq, substr) = seqs_from_file(filepath);
     let indices = substring_position(seq, substr);
