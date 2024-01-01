@@ -1,3 +1,4 @@
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
 use rayon::prelude::*;
 use std::fmt::Display;
 use std::fs::File;
@@ -11,7 +12,7 @@ use std::sync::{Arc, Mutex};
 // This code utilizes both the builder and the iterator design pattern to parse a fastq file
 // Product
 #[derive(Debug)]
-struct FastqRecord {
+pub struct FastqRecord {
     id: String,
     seq: String,
     plus: String,
@@ -21,7 +22,7 @@ impl Display for FastqRecord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "@{}\n{}\n{}\n{}\n\n",
+            "{}\n{}\n{}\n{}\n",
             self.id, self.seq, self.plus, self.qual
         )
     }
@@ -77,64 +78,136 @@ impl FastqRecordBuilder {
 
 #[derive(Debug)]
 pub struct FastqIterator<R: BufRead> {
-    lines: R,
+    buffer: R,
 }
-impl<R: BufRead + Send> FastqIterator<R> {
-    fn new(lines: R) -> Self {
-        FastqIterator { lines }
+impl<R: BufRead> FastqIterator<R> {
+    fn new(reader: R) -> Self {
+        Self { buffer: reader }
     }
 }
-impl<R: BufRead + Send> Iterator for FastqIterator<R> {
+impl<R: BufRead> Iterator for FastqIterator<R> {
     type Item = FastqRecord;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Initalize the variables
-        let (mut id, mut seq, mut qual) = (String::new(), String::new(), String::new());
+        let (mut id, mut seq, mut plus, mut qual) =
+            (String::new(), String::new(), String::new(), String::new());
 
         // Read buffer info into variables
-        if let (Ok(_), Ok(_), Ok(_)) = (
-            self.lines.read_line(&mut id),
-            self.lines.read_line(&mut seq),
-            self.lines.read_line(&mut qual),
-        ) {
-            // Return the class
-            FastqRecordBuilder::new()
-                .id(id.trim_start_matches('@').trim().to_string())
-                .sequence(seq.trim().to_string())
-                .plus('+'.to_string())
-                .qual(qual.trim().to_string())
+        if [
+            self.buffer.read_line(&mut id),
+            self.buffer.read_line(&mut seq),
+            self.buffer.read_line(&mut plus),
+            self.buffer.read_line(&mut qual),
+        ]
+        .iter()
+        .all(|result| result.is_ok() && result.as_ref().unwrap() > &0usize)
+        {
+            let record = FastqRecordBuilder::new()
+                .id(id)
+                .sequence(seq)
+                .plus(plus)
+                .qual(qual)
                 .build()
-                .ok()
+                .ok();
+
+            // let record = FastqRecordBuilder::new()
+            //     .id(id.strip_prefix("@")?.trim().to_string())
+            //     .sequence(seq.trim().to_string())
+            //     .plus(plus.trim().to_string())
+            //     .qual(qual.trim().to_string())
+            //     .build()
+            //     .ok();
+            record
         } else {
-            None // Return None for End of Iteration
+            None
         }
     }
 }
-impl<'a, R: BufRead + Read> IntoParallelIterator for &'a FastqIterator<R>
-where
-    R: Send + Sync,
-    R::Error: Send + Sync,
-    <Self as Iterator>::Item: Send + Sync,
-{
-    type Item = FastqRecord;
-    type Iter = rayon::iter::Cloned<rayon::slice::Iter<'a, FastqRecord>>;
+
+trait ParseStrategy<R: BufRead> {
+    fn parse_reads(&self, buffer: FastqIterator<R>);
+}
+
+struct ParseCollect;
+impl<R: BufRead> ParseStrategy<R> for ParseCollect {
+    // Just collecting the items, no print. 0.88s
+    fn parse_reads(&self, parser: FastqIterator<R>) {
+        let len_items = parser.collect::<Vec<_>>().len();
+        println!("{len_items}");
+    }
+}
+
+struct ParseFold;
+impl<R: BufRead> ParseStrategy<R> for ParseFold {
+    // Read tracking implementation, 0.517s
+    fn parse_reads(&self, parser: FastqIterator<R>) {
+        let count = parser.fold(0, |acc, _| {
+            let count = acc + 1;
+            if count % 10000 == 0 {
+                println!("Processed {} sequences", count);
+            }
+            count
+        });
+    }
+}
+
+struct ParseParallel;
+impl<R: BufRead> ParseStrategy<R> for ParseParallel {
+    // Parallel Implementaton with print 16.38s, without, 0.6
+    fn parse_reads(&self, parser: FastqIterator<R>) {
+        let records: Vec<FastqRecord> = parser.collect();
+        records
+            .into_par_iter() // Takes ownership, but is faster than par_iter
+            .for_each(|_record| ());
+    }
+}
+
+struct ParseForLoop;
+impl<R: BufRead> ParseStrategy<R> for ParseForLoop {
+    // For loop implementaton, yes print. 27.63s
+    fn parse_reads(&self, parser: FastqIterator<R>) {
+        for (i, record) in parser.enumerate() {
+            println!("{}:{}", i, record)
+        }
+    }
+}
+
+struct ParseWhile;
+impl<R: BufRead> ParseStrategy<R> for ParseWhile {
+    // While let implementation, 26.65s
+    fn parse_reads(&self, mut parser: FastqIterator<R>) {
+        // let mut parser = FastqIterator::new(fastq_buffer);
+        while let Some(record) = parser.next() {
+            println!("{}", record);
+        }
+    }
+}
+struct Parser<R: BufRead> {
+    strategy: Box<dyn ParseStrategy<R>>,
 }
 fn main() -> Result<(), std::io::Error> {
-    let path = Path::new("/Users/mladenrasic/Projects/WEVOTE-strain/testcov_R1.fastq");
+    let path = "/Users/mladenrasic/Projects/WEVOTE-strain/testcov_R1.fastq";
+
     let fastq_buffer = BufReader::new(File::open(path).expect("Failed to open file"));
-    let parser = FastqIterator::new(fastq_buffer);
-    // let records: Vec<FastqRecord> = parser.collect();
+    let fq_iterator = FastqIterator::new(fastq_buffer);
+    ParseCollect {}.parse_reads(fq_iterator);
 
-    println!("Parallel Time!");
-    parser.par_iter().for_each(|record| println!("{}", record));
+    let fastq_buffer = BufReader::new(File::open(path).expect("Failed to open file"));
+    let fq_iterator = FastqIterator::new(fastq_buffer);
+    ParseFold {}.parse_reads(fq_iterator);
 
-    // for record in parser {
-    //     println!("{}", record)
-    // }
+    let fastq_buffer = BufReader::new(File::open(path).expect("Failed to open file"));
+    let fq_iterator = FastqIterator::new(fastq_buffer);
+    ParseParallel {}.parse_reads(fq_iterator);
 
-    // while let Some(record) = parser.iter_records() {
-    //     println!("{}", record);
-    // }
+    let fastq_buffer = BufReader::new(File::open(path).expect("Failed to open file"));
+    let fq_iterator = FastqIterator::new(fastq_buffer);
+    ParseForLoop {}.parse_reads(fq_iterator);
+
+    let fastq_buffer = BufReader::new(File::open(path).expect("Failed to open file"));
+    let fq_iterator = FastqIterator::new(fastq_buffer);
+    ParseWhile {}.parse_reads(fq_iterator);
+
     Ok(())
 }
 
@@ -146,7 +219,7 @@ mod tests {
     fn test_fastq_parser() {
         let fastq_content = "@SEQ1\nACTG\n+\nIIII\n@SEQ2\nTGCA\n+\nIIII";
         let buf = BufReader::new(Cursor::new(fastq_content));
-        let mut parser = FastqIterator { lines: buf };
+        let mut parser = FastqIterator { buffer: buf };
 
         let record1 = parser.next().unwrap();
         assert_eq!(record1.id, "SEQ1");
@@ -159,14 +232,33 @@ mod tests {
         assert_eq!(record2.seq, "TGCA");
         assert_eq!(record2.plus, "+");
         assert_eq!(record2.qual, "IIII");
-        assert!(!parser.iter_records().is_none());
+        assert!(!parser.next().is_none());
     }
 
     #[test]
-    fn test_fastq_parser_missing_fields() {
-        let fastq_content = "@SEQ1\nACTG\n+\nIIII\n@SEQ2\nTGCA\n+";
+    fn test_fastq_parser_empty() {
+        let fastq_content = "";
         let buf = BufReader::new(Cursor::new(fastq_content));
-        let mut parser = FastqIterator(buf);
-        assert!(!parser.iter_records().is_none());
+        let mut parser = FastqIterator { buffer: buf };
+
+        assert!(parser.next().is_none());
+    }
+    #[test]
+    fn test_fastq_parser_missing_fields() {
+        let fastq_content = "@SEQ1\nACTG\n\n\n@SEQ2\nTGCA\n+\nIIII";
+        let buf = BufReader::new(Cursor::new(fastq_content));
+        let mut parser = FastqIterator { buffer: buf };
+
+        let record1 = parser.next().unwrap();
+        assert_eq!(record1.id, "SEQ1");
+        assert_eq!(record1.seq, "ACTG");
+        assert_eq!(record1.plus, "");
+        assert_eq!(record1.qual, "");
+
+        let record2 = parser.next().unwrap();
+        assert_eq!(record2.id, "SEQ2");
+        assert_eq!(record2.seq, "TGCA");
+        assert_eq!(record2.plus, "+");
+        assert_eq!(record2.qual, "IIII");
     }
 }
