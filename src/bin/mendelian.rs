@@ -12,7 +12,7 @@ fn mendel(n: f32, m: f32, k: f32) -> f32 {
     // = n**2 / (n + m + k)**2 + 1/2[m**2/(n + m + k)**2] +++ n*k / (n + m + k)**2 +++ (.5m**2) / (n + m + k)**2
     // = n**2 + n*k + .5m**2 / (n + m + k)**2
     // Prob(Yy)
-    let total_possible = ((n + k + m) * (n + k + m - 1.0) / 2.0);
+    let _total_possible = (n + k + m) * (n + k + m - 1.0) / 2.0;
     //Prob YY dominant = Prob (YY) * 1 = n / (n + k + m) or n*(n+k+m) / denom
     //Prob Yy dominant = Prob Yy * YY = n*m / (n+k+m)**2 + 3/4*m**2 / denom + 1/2*m*k / denom
     //Prob yy dominant = Prob YY *yy = n*k/denom + 1/2*m*k / denom + 0

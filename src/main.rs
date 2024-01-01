@@ -1,6 +1,6 @@
 use std::collections::HashMap; // itertools = "0.10"
-use std::fs::{self, File};
-use std::io::{BufRead, BufReader};
+use std::fs::{self};
+use std::io::{BufRead};
 
 /*
 fn translate(input: &str) {
@@ -40,7 +40,7 @@ fn build_codon_table(file: &str) -> Option<HashMap<String, String>> {
 }
 
 fn main() {
-    let input = "/Users/mladenrasic/Downloads/rosalind_prot.txt";
+    let _input = "/Users/mladenrasic/Downloads/rosalind_prot.txt";
     let codon_file = "/Users/mladenrasic/Downloads/codon-1.txt";
     build_codon_table(&codon_file);
     // translate(input);

@@ -1,7 +1,7 @@
-use std::io::{BufReader, Read};
-use std::{fmt::Write, fs::File};
+use std::io::{BufReader};
+use std::{fs::File};
 extern crate bio;
-use bio::io::fastq::{self, Error, FastqRead};
+use bio::io::fastq::{self, Error};
 
 /*
 fn interleave_fastq<R: FastqRead, W: Write>(
@@ -106,7 +106,7 @@ fn main() -> Result<(), Error> {
     let out_file = File::create("/Users/mladenrasic/Downloads/interleave.fastq")?;
 
     let reader1 = fastq::Reader::new(file1);
-    let reader2 = fastq::Reader::new(file2);
+    let _reader2 = fastq::Reader::new(file2);
     let mut writer = fastq::Writer::new(out_file);
 
     // interleave_fastq2(reader1, reader2, &mut writer)?;

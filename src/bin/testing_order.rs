@@ -1,7 +1,7 @@
 use core::fmt;
 use std::{cmp::Ordering, fmt::Display};
 
-use bio::seq_analysis;
+
 
 struct Point {
     x: i32,

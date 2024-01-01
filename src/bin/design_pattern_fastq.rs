@@ -1,13 +1,13 @@
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
+use rayon::iter::{IntoParallelIterator};
 use rayon::prelude::*;
 use std::fmt::Display;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::io::Cursor;
-use std::io::Read;
-use std::path::Path;
-use std::sync::{Arc, Mutex};
+
+
+
+
 
 // This code utilizes both the builder and the iterator design pattern to parse a fastq file
 // Product
@@ -141,7 +141,7 @@ struct ParseFold;
 impl<R: BufRead> ParseStrategy<R> for ParseFold {
     // Read tracking implementation, 0.517s
     fn parse_reads(&self, parser: FastqIterator<R>) {
-        let count = parser.fold(0, |acc, _| {
+        let _count = parser.fold(0, |acc, _| {
             let count = acc + 1;
             if count % 10000 == 0 {
                 println!("Processed {} sequences", count);

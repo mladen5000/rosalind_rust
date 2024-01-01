@@ -1,6 +1,6 @@
 // Problem 4 - Computing the GC content of a DNA string
-use bio::seq_analysis::gc;
-use std::collections::HashMap;
+
+
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
 
