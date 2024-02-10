@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader};
 
 #[derive(Debug)]
 struct Node {
-    id: Vec<u8>,
+    id: String,
     seq: Vec<u8>,
 }
 fn main() {
@@ -19,13 +19,12 @@ fn main() {
     // Iterate over the records
     for record in parser.records() {
         let record = record.expect("Failed to parse record");
+        let id = record.id().to_string();
+        let seq = record.seq().to_owned(); // Clone the sequence data
 
         // Create a new node
         let end = record.id().len() - 3;
-        let node = Node {
-            id: record.id().to_string()[..end],
-            seq: record.seq().to_owned[..end],
-        };
+        let node = Node { id, seq };
 
         // Add the node to the vector
         full_vec.push(node);
