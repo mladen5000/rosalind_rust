@@ -1,30 +1,70 @@
-use bio::io::fastq::{self, Record};
-use std::fmt::Error;
-use std::fs::File;
-use std::io;
-use std::path::Path;
+use anyhow::{Context, Result};
+use bio::io::fastq::{self, Reader, Record};
+use std::{
+    error::{self, Error},
+    fs::File,
+    io::{self, BufRead, BufReader, Write},
+    path::Path,
+};
+// Import the missing Reader type
 
 fn main() {
-    // case 1
-    // let file1 = "/Users/mladenrasic/Downloads/sample.fastq";
-    // let file2 = "/Users/mladenrasic/Downloads/sample.fastq";
-
     // case 2
     let file1 = "/Users/mladenrasic/Projects/rosalind_rust/MBTUMA001_S1_L001_R1_001.fastq";
     let file2 = "/Users/mladenrasic/Projects/rosalind_rust/MBTUMA001_S1_L001_R2_001.fastq";
 
-    // interleave(file1, file2);
-    merge(file1, file2).expect("No luck with merge");
+    let reader1 = get_reader(file1);
+    let reader2 = get_reader(file2);
+    // Run function
+    process_reverse_complement(reader1);
+    interleave(reader1, reader2);
+    deinterleave(reader1);
+    merge(reader1, reader2).expect("No luck with merge");
 }
 
-fn interleave(file1: &str, file2: &str) {
+fn process_reverse_complement<R>(reader: Reader<BufReader<R>>)
+where
+    R: io::Read,
+{
+    let mut writer = fastq::Writer::new(io::stdout());
+
+    for result in reader.records() {
+        let record = result.expect("Can't get record from reader");
+        let reverse_complement: String = record
+            .seq()
+            .iter()
+            .rev()
+            .map(|c| match *c as char {
+                'A' | 'a' => 'T',
+                'T' | 't' => 'A',
+                'C' | 'c' => 'G',
+                'G' | 'g' => 'C',
+                x => x,
+                _ => panic!("Invalid character"),
+            })
+            .collect::<String>(); // Collect the characters into a String
+
+        // Build Record
+        let rc_record = Record::with_attrs(
+            &record.id(),
+            None,
+            reverse_complement.as_bytes(),
+            record.qual(),
+        );
+
+        // Write record to stdout
+        writer
+            .write_record(&rc_record)
+            .expect("Record could not be written");
+    }
+}
+
+fn interleave<R>(reader1: Reader<BufReader<R>>, reader2: Reader<BufReader<R>>)
+where
+    R: io::Read,
+{
     // Get readers and writers
-    let reader1 = File::open(file1)
-        .map(fastq::Reader::new)
-        .expect("Can't open fastq file1");
-    let reader2 = File::open(file2)
-        .map(fastq::Reader::new)
-        .expect("Can't open fastq file2");
+
     let mut writer = fastq::Writer::new(io::stdout());
 
     for (result1, result2) in reader1.records().zip(reader2.records()) {
@@ -41,25 +81,49 @@ fn interleave(file1: &str, file2: &str) {
     }
 }
 
-fn merge(file1: &str, file2: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn deinterleave<R>(reader: Reader<BufReader<R>>) -> Result<()>
+where
+    R: io::Read,
+{
+    let mut writer1 = fastq::Writer::new(io::stdout());
+    let mut writer2 = fastq::Writer::new(io::stdout());
+
+    // Collect records into chunks of 2
+    let nums: Vec<_> = reader1.records().collect();
+
+    for chunk in nums.chunks(2) {
+        let (result1, result2) = match chunk {
+            [Ok(record1), Ok(record2)] => (record1, record2),
+            _ => panic!("Invalid chunk size"),
+        };
+
+        let record_blank = Record::default();
+        let record1 = result1; //.expect("nums");
+        let record2 = result2; //.expect("nums2");
+        println!();
+        writer1
+            .write_record(&record_blank)
+            .expect("Can't write blank record");
+        writer1
+            .write_record(&record1)
+            .expect("Record1 could not be written");
+        writer2
+            .write_record(&record2)
+            .expect("Record2 could not be written");
+        println!();
+    }
+
+    // Interleave
+    Ok(())
+}
+
+fn merge<R>(reader1: Reader<BufReader<R>>, reader2: Reader<BufReader<R>>) -> Result<()>
+where
+    R: io::Read,
+{
     // Get readers and writers
-    let reader1 = File::open(file1)
-        .map(fastq::Reader::new)
-        .expect("Can't open fastq file1");
-    let reader2 = File::open(file2)
-        .map(fastq::Reader::new)
-        .expect("Can't open fastq file2");
 
-    let writer_path = Path::new(file1)
-        .parent()
-        .expect("Source path has no parent.")
-        .join("outfile.fastq");
-    let mut writer = File::create(writer_path)
-        .map(fastq::Writer::new)
-        .expect("Can't create writer for writer_path");
-
-    // let mut writer = fastq::Writer::new(io::stdout());
-    // let mut writer = File::open()
+    let mut writer = fastq::Writer::new(io::stdout());
 
     for (result1, result2) in reader1.records().zip(reader2.records()) {
         // Check for records
@@ -87,4 +151,32 @@ fn merge(file1: &str, file2: &str) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+fn write_to_file() {
+    let writer_path = Path::new("/Users/mladenrasic/")
+        .parent()
+        .expect("Source path has no parent.")
+        .join("outfile.fastq");
+
+    let mut writer = File::create(&writer_path)
+        .map(fastq::Writer::new)
+        .expect("Can't create writer for writer_path");
+
+    // Write to the file
+    let record = bio::io::fastq::Record::new();
+    writer
+        .write_record(&record)
+        .expect("Failed to write to file");
+}
+
+fn get_reader<R>(file: &str) -> Reader<BufReader<R>>
+where
+    R: io::Read,
+{
+    let reader = File::open(file)
+        .map(BufReader::new)
+        .map(fastq::Reader::new)
+        .expect("Can't open fastq file1");
+    reader
 }
