@@ -1,4 +1,5 @@
 /target
+/fqparser
 rustlings
 *fastq
 .mypy_cache

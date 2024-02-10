@@ -17,8 +17,6 @@
 		},
 		"rust-analyzer.linkedProjects": [
 			"./Cargo.toml",
-			"./rustlings/Cargo.toml",
-			"./rustlings/Cargo.toml"
 		]
 	}
 }
