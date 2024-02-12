@@ -1,5 +1,6 @@
-use bio::io::fastq;
+use bio::io::fasta;
 use needletail::parser;
+use rayon::prelude::*;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -15,20 +16,21 @@ struct Edge {
 }
 
 #[derive(Debug)]
-struct OverlapGraph {
-    nodes: Vec<Node>,
-    edges: Vec<Edge>,
+struct OverlapGraph<'a> {
+    nodes: &'a Vec<Node>,
+    edges: &'a Vec<Edge>,
 }
 
 fn main() {
+    let n = 3; //Overlap value
     let mut node_vec: Vec<Node> = vec![];
     let mut edge_vec: Vec<Edge> = vec![];
 
     // Parse the FASTQ file
     let reader = BufReader::new(
-        File::open("/Users/mladenrasic/Downloads/sample.fastq").expect("Failed to open file"),
+        File::open("/Users/mladenrasic/Downloads/rosalind_grph.txt").expect("Failed to open file"),
     );
-    let parser = fastq::Reader::new(reader);
+    let parser = fasta::Reader::new(reader);
 
     // Initialize the node
     let mut node = Node {
@@ -51,30 +53,40 @@ fn main() {
         // Add the node to the vector
         node_vec.push(node);
     }
-    for i in node_vec.iter() {
-        for j in node_vec.iter() {
-            let suffix = &i.seq[(i.seq.len() - 3)..i.seq.len()]; // get last 3 NTs
-            let prefix = &j.seq[..3]; // get first 3 NTs
+    let mut node_vec2 = node_vec.clone();
+
+    // Determine all edges with an overlap of n
+    for i in node_vec.iter_mut() {
+        for j in node_vec2.iter_mut() {
+            let suffix = &i.seq[(i.seq.len() - n)..i.seq.len()]; // get last 3 NTs
+            let prefix = &j.seq[..n]; // get first 3 NTs
 
             // Sanity check
-
-            assert_eq!(suffix.len(), 3);
+            assert_eq!(suffix.len(), n);
             assert_eq!(suffix.len(), prefix.len());
+
+            // Determine overlap regions and build edge
             if suffix == prefix {
-                // println!("{}...{}", i.id, j.id);
-                let edge = Edge {
-                    from: (*i).clone(),
-                    to: (*j).clone(),
-                }; // Clone the Node structs
-                edge_vec.push(edge);
+                // Append Edge onto the Vec<Edge>
+                edge_vec.push(Edge {
+                    from: (i).clone(),
+                    to: (j).clone(),
+                });
+                println!("{} {}", i.id, j.id);
+                // Clone the Node structs
+                // edge_vec.push(edge);
             }
         }
     }
     let overlap_graph = OverlapGraph {
-        nodes: node_vec,
-        edges: edge_vec,
+        nodes: &node_vec,
+        edges: &edge_vec,
     };
-    println!("{:?}", overlap_graph);
+    println!(
+        "{:?}\n{:?}",
+        overlap_graph.nodes.len(),
+        overlap_graph.edges.len()
+    );
 
     // Process each record
     // println!("{:?}", full_vec);
