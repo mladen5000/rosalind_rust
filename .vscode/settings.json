@@ -6,12 +6,8 @@
     "activityBarBadge.background": "#bf0060",
     "activityBarBadge.foreground": "#e7e7e7"
   },
-  "rust-analyzer.linkedProjects": [
-    "./Cargo.toml",
-    "./rustlings/Cargo.toml",
-    "./rustlings/Cargo.toml"
-  ],
-  "rust-analyzer.checkOnSave": false,
+  "rust-analyzer.linkedProjects": ["./Cargo.toml"],
+  "rust-analyzer.checkOnSave": true,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
