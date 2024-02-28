@@ -13,4 +13,4 @@ needletail = "0.5.1"
 anyhow = "1.0.79"
 tokio = { version = "1.36.0", features = ["full"] }
 futures = "0.3.30"
-memmap = { version = "*", features = ["nightly"] }
+memmap = { version = "0.7.0", features = ["nightly"] }
