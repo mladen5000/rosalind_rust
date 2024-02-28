@@ -1,23 +1,37 @@
 use std::{collections::HashMap, hash::Hash};
 
-use itertools::Itertools;
+use bio::io::fasta;
+use itertools::{Chunks, Itertools};
 use std::iter::Iterator; // Add the Iterator trait import
-
 fn main() {
     let input_string = String::from("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG");
+    let input_string = fasta::Reader::from_file("/Users/mladenrasic/Downloads/rosalind_orf-2.txt")
+        .expect("Can't find file");
     let codon_aa_map = build_codon_aa_map();
 
-    for i in 0..=2 {
-        // Forward strand
-        let frame = &transcribe(&input_string)[i..];
-        let protein_string = convert_codons(frame, &codon_aa_map);
-        let subseq = start_stop(&protein_string);
+    for is in input_string.records() {
+        let is = is.expect("record error");
+        for i in 0..=2 {
+            // Forward strand
+            let frame = &transcribe(
+                String::from_utf8(is.seq().to_owned())
+                    .expect("lah")
+                    .as_str(),
+            )[i..];
+            let protein_string = convert_codons(frame, &codon_aa_map);
+            let subseq = start_stop(&protein_string);
 
-        // Reverse complement strand
-        let frame = &reverse_complement(&input_string)[i..];
-        let protein_string = convert_codons(frame, &codon_aa_map);
-        let subseq = start_stop(&protein_string);
-        // println!("{subseq}");
+            // Reverse complement strand
+            // let frame = &reverse_complement(&is.seq())[i..];
+            let frame = &reverse_complement(
+                String::from_utf8(is.seq().to_owned())
+                    .expect("lah")
+                    .as_str(),
+            )[i..];
+            let protein_string = convert_codons(frame, &codon_aa_map);
+            let subseq = start_stop(&protein_string);
+            // println!("{subseq}");
+        }
     }
 }
 
@@ -117,7 +131,7 @@ fn reverse_complement(seq: &str) -> String {
             'C' => 'G',
             'G' => 'C',
             'T' => 'A',
-            _ => unreachable!(),
+            x => x,
         })
         .collect::<String>()
 }
@@ -127,7 +141,6 @@ fn transcribe(seq: &str) -> String {
         .map(|c| match c {
             'T' => 'U',
             x => x,
-            _ => unreachable!(),
         })
         .collect::<String>()
 }
@@ -135,12 +148,16 @@ fn transcribe(seq: &str) -> String {
 fn start_stop(seq: &str) -> String {
     let seq = match seq.find("M") {
         Some(pos) => &seq[pos..],
-        None => seq,
+        None => {
+            let pos = seq.len();
+            &seq[pos..]
+        }
     };
     let seq = match seq.find("Stop") {
         Some(pos) => &seq[..pos],
         None => seq,
     };
-    println!("The sequence with the new start and stop is: {seq}");
+    // println!("The sequence with the new start and stop is: {seq}");
+    println!("{seq}");
     seq.to_string()
 }
