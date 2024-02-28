@@ -23,28 +23,24 @@ G: 1 1 6 3 0 1 0 0
 T: 1 5 0 0 0 1 1 6
 */
 
-use bio::bio_types::annot::pos;
 use bio::io::fasta;
 use std::fs::File;
 use std::io::BufReader;
 
 fn main() {
     // Parse the FASTQ file
-    let reader = File::open("/Users/mladenrasic/Downloads/rosalind_cons.txt")
+    let reader = File::open("/Users/mladenrasic/Downloads/rosalind_cons-1.txt")
         .map(BufReader::new)
         .map(fasta::Reader::new)
         .expect("Failed to open file and create reader");
 
     let mut matrix = vec![];
 
-    let (mut count_a, mut count_c, mut count_g, mut count_t) = (0, 0, 0, 0);
     // Go through the records and do boring stuff to get sequence
-
     for record in reader.records() {
         let record = record.expect("Failed to parse record");
         // let _id = record.id().to_string();
         let seq = unsafe { String::from_utf8_unchecked(record.seq().to_owned()) }; // Clone the sequence data
-        let seq_length = seq.len();
 
         // Populate consensus matrix
         for (i, c) in seq.chars().enumerate() {
@@ -62,10 +58,9 @@ fn main() {
     }
 
     let consensus_seq = get_consensus_sequence(&matrix);
-    println!("{}", consensus_seq);
+    println!("{consensus_seq}\n");
     // Output consense matrix
     print_consensus_matrix(&matrix);
-    println!();
 
     // println!("{:?}", matrix);
 }
