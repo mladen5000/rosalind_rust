@@ -1,7 +1,3 @@
-
-
-
-
 #[derive(Debug)]
 struct Task {
     id: u32,
@@ -14,6 +10,8 @@ enum Status {
     InProgress,
     Done,
 }
+
+impl Status {}
 
 fn create_task(id: u32, description: String) -> Task {
     Task {
