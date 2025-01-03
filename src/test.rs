@@ -1,9 +1,8 @@
-use bio::io::fasta;
-use rayon::prelude::*;
+use std::collections::HashMap;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Node {
     id: String,
     seq: String,
@@ -32,7 +31,7 @@ fn main() {
     let parser = fasta::Reader::new(reader);
 
     // Initialize the node
-    let node = Node {
+    let mut node = Node {
         id: String::new(),
         seq: String::new(),
     };
@@ -45,7 +44,7 @@ fn main() {
 
         // Create a new node
         let node = Node {
-            id: id.to_string(),
+            id: id.to_string(), // Clone the id
             seq: seq.to_string(),
         };
 
@@ -78,6 +77,7 @@ fn main() {
         }
     }
     let overlap_graph = OverlapGraph {
+        // Create the OverlapGraph struct
         nodes: &node_vec,
         edges: &edge_vec,
     };

@@ -1,6 +1,4 @@
-use std::collections::HashSet;
 
-use itertools::all;
 
 fn permutations_with_repeats(k: usize) -> Vec<Vec<char>> {
     let hashset = ['A', 'B', 'C', 'D', 'E', 'F'];

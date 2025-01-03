@@ -1,7 +1,11 @@
 use std::collections::HashMap; // itertools = "0.10"
 use std::fs::{self};
-use std::io::{BufRead};
+use std::io::BufRead;
 
+pub mod LEXV;
+pub mod enumerate_kmers;
+pub mod mendelian;
+pub mod rosalind_claude;
 /*
 fn translate(input: &str) {
     let rna = fs::read_to_string(input)
@@ -21,7 +25,6 @@ fn lookup(codon: &str) -> HashMap<&str, &str> {
     //    let blah =
 }
 */
-
 fn build_codon_table(file: &str) -> Option<HashMap<String, String>> {
     let mut codon_map = HashMap::new();
     for line in fs::read_to_string(file)
@@ -40,8 +43,10 @@ fn build_codon_table(file: &str) -> Option<HashMap<String, String>> {
 }
 
 fn main() {
-    let _input = "/Users/mladenrasic/Downloads/rosalind_prot.txt";
-    let codon_file = "/Users/mladenrasic/Downloads/codon-1.txt";
-    build_codon_table(&codon_file);
+    // count_motif("ATCGATCGA", "ATCG");
+    LEXV::main();
+    // let _input = "/Users/mladenrasic/Downloads/rosalind_prot.txt";
+    // let codon_file = "/Users/mladenrasic/Downloads/codon-1.txt";
+    // build_codon_table(&codon_file);
     // translate(input);
 }

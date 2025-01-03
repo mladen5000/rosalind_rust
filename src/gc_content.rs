@@ -1,6 +1,5 @@
 // Problem 4 - Computing the GC content of a DNA string
 
-
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
 
