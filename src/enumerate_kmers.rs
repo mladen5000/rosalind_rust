@@ -1,5 +1,3 @@
-
-
 fn permutations_with_repeats(k: usize) -> Vec<Vec<char>> {
     let hashset = ['A', 'B', 'C', 'D', 'E', 'F'];
     if k == 0 {

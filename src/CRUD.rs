@@ -1,7 +1,3 @@
-
-
-
-
 #[derive(Debug)]
 struct Task {
     id: u32,

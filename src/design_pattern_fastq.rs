@@ -1,13 +1,9 @@
-use rayon::iter::{IntoParallelIterator};
+use rayon::iter::IntoParallelIterator;
 use rayon::prelude::*;
 use std::fmt::Display;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-
-
-
-
 
 // This code utilizes both the builder and the iterator design pattern to parse a fastq file
 // Product

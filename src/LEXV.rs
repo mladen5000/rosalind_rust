@@ -4,6 +4,8 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt::Display;
 use std::ops::Add;
+use std::result;
+use std::vec;
 
 /// This task involves 1. generating all possible permutations of a string (length n) from length 1 - n
 /// 2. Sorting these based on the order the were given, not their regular alphabetical order
@@ -12,7 +14,22 @@ use std::ops::Add;
 
 #[derive(Debug, Clone)]
 struct Alphabet(Vec<Letter>);
-
+impl PartialOrd for Alphabet {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+impl Ord for Alphabet {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.cmp(&other.0)
+    }
+}
+impl PartialEq for Alphabet {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+impl Eq for Alphabet {}
 impl Add for Alphabet {
     type Output = Self;
 
@@ -20,25 +37,21 @@ impl Add for Alphabet {
         Alphabet([self.0, rhs.0].concat())
     }
 }
-
 impl Iterator for Alphabet {
     type Item = Letter;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut current = 0;
-        if current < self.0.len() {
-            let result = self.0[current].clone(); // Use clone if T: Clone
-            current += 1;
-            Some(result)
+        if self.0.is_empty() {
+            None
         } else {
-            None // End of iteration
+            Some(self.0.remove(0))
         }
     }
 }
-
 impl Display for Alphabet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{:?}", self.0);
+        let result_string = self.0.iter().map(|l| l.0).collect::<String>();
+        write!(f, "{}", result_string)
     }
 }
 impl Alphabet {
@@ -91,7 +104,11 @@ struct Letter(char, u8);
 
 impl Ord for Letter {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.1.cmp(&other.1)
+        match self.1.cmp(&other.1) {
+            Ordering::Equal => Ordering::Equal,
+            Ordering::Greater => Ordering::Greater,
+            Ordering::Less => Ordering::Less,
+        }
     }
 }
 
@@ -100,46 +117,51 @@ impl PartialOrd for Letter {
         Some(self.cmp(&other))
     }
 }
+fn permute_them_all_with_repeats(alphabit: Alphabet, max_depth: usize) -> Vec<Alphabet> {
+    let vec_letters = &alphabit.0;
 
-fn permute_them_all(alphabit: Alphabet) -> Vec<Alphabet> {
-    if alphabit.0.len() == 0 {
+    // Base case: If max_depth is 0, return a single empty permutation
+    if max_depth == 0 {
         return vec![Alphabet(vec![])];
     }
-    let mut perms = vec![];
 
-    for i in 0..alphabit.0.len() {
-        let fixed = alphabit.0[i];
-        let rest = Alphabet([alphabit.0[..i].to_vec(), alphabit.0[1 + i..].to_vec()].concat());
+    let mut perms = Vec::new();
 
-        let rest_permutations = permute_them_all(rest);
+    // Loop through each letter in the input
+    for i in 0..vec_letters.len() {
+        let fixed = vec_letters[i]; // Fix the current letter
 
+        // Recursively generate permutations with the fixed letter
+        let rest_permutations = permute_them_all_with_repeats(alphabit.clone(), max_depth - 1);
+
+        // Combine the fixed letter with each recursive permutation
         for perm in rest_permutations {
             let mut new_perm = vec![fixed];
-            new_perm.extend(perm.0); // Append rest of the permutation
+            new_perm.extend(perm.0); // Append the rest of the permutation
             perms.push(Alphabet(new_perm));
         }
     }
+
     perms
 }
 
-pub(crate) fn build_it_up(sequence: &str) -> Alphabet {
-    Alphabet::new_from_str(&sequence)
-}
-
 pub fn main() {
-    // let sequence = "DNA";
-    let sequence = "EZRW"; //BDOMIS";
-    let alpha = build_it_up(sequence);
-    let mut all_perms = permute_them_all(alpha);
-    let mut results = vec![];
+    let input = "AZQ";
+    let alphabet = Alphabet::new_from_str(input);
 
-    all_perms.sort_by(|a, b| a.clone().cmp(b.clone()));
-    for alphabit in all_perms {
-        let result: String = alphabit.0.iter().map(|i| i.0).collect();
-        results.push(result);
+    // Generate permutations of all lengths (1 to 3 for DNA)
+    let mut all_perms = Vec::new();
+    for depth in 1..=alphabet.len() {
+        let perms = permute_them_all_with_repeats(alphabet.clone(), depth);
+        all_perms.extend(perms);
     }
-    for r in results {
-        println!("{r:?}");
+
+    // Sort the results based on custom order
+    all_perms.sort();
+
+    // Print the sorted results
+    for perm in all_perms {
+        println!("{}", perm);
     }
 }
 // println!("{lex_set:?}");
@@ -153,7 +175,7 @@ mod tests {
 
     #[test]
     fn check_dna_ordering() {
-        let input_string = "DNA";
+        let input_string = "AZQ";
         let letters = Alphabet::new_from_str(&input_string);
         assert!(letters.0[0] < letters.0[1]);
     }
